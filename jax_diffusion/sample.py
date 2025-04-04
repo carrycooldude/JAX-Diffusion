@@ -30,10 +30,23 @@ def sample(state, num_samples=10):
     return xt
 
 def main():
+    # Initialize model and diffusion instances
+    model = UNet()
+    diffusion = Diffusion()
+    
     # Attempt to load the checkpoint saved by the training script
     try:
         with open("checkpoint.pkl", "rb") as f:
-            state = pickle.load(f)
+            saved_state = pickle.load(f)
+            
+        # Create a complete state with both saved and new attributes
+        state = TrainState(
+            params=saved_state.params,
+            model=model,
+            diffusion=diffusion,
+            optimizer=None,  # Not needed for sampling
+            opt_state=saved_state.opt_state
+        )
     except FileNotFoundError:
         print("No checkpoint found. Please train the model first and save a checkpoint.")
         return
